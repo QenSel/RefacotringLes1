@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using VivesBlog_Core;
-using VivesBlog_Models;
+using VivesBlog.Models;
 
-namespace VivesBlog.Ui.MVC
+namespace VivesBlog.Controllers
 {
     public class HomeController : Controller
     {
@@ -35,7 +34,7 @@ namespace VivesBlog.Ui.MVC
         {
             var article = _database.Articles
                 .Include(a => a.Author)
-                .SingleOrDefault(a => a.Id == id);
+                .SingleOrDefault(a => a.Key == id);
 
             return View(article);
         }
@@ -84,8 +83,8 @@ namespace VivesBlog.Ui.MVC
 
             var dbPerson = _database.People.Single(p => p.Id == person.Id);
 
-            dbPerson.FirstName = person.FirstName;
-            dbPerson.LastName = person.LastName;
+            dbPerson.Name1 = person.Name1;
+            dbPerson.Name2 = person.Name2;
 
             _database.SaveChanges();
 
@@ -150,7 +149,7 @@ namespace VivesBlog.Ui.MVC
         [HttpGet("Blog/Edit/{id}")]
         public IActionResult BlogEdit(int id)
         {
-            var article = _database.Articles.Single(p => p.Id == id);
+            var article = _database.Articles.Single(p => p.Key == id);
 
             var articleModel = CreateArticleModel(article);
 
@@ -166,7 +165,7 @@ namespace VivesBlog.Ui.MVC
                 return View(articleModel);
             }
 
-            var dbArticle = _database.Articles.Single(p => p.Id == article.Id);
+            var dbArticle = _database.Articles.Single(p => p.Key == article.Key);
 
             dbArticle.Title = article.Title;
             dbArticle.Description = article.Description;
@@ -183,7 +182,7 @@ namespace VivesBlog.Ui.MVC
         {
             var article = _database.Articles
                 .Include(a => a.Author)
-                .Single(p => p.Id == id);
+                .Single(p => p.Key == id);
 
             return View(article);
         }
@@ -191,7 +190,7 @@ namespace VivesBlog.Ui.MVC
         [HttpPost("Blog/Delete/{id}")]
         public IActionResult BlogDeleteConfirmed(int id)
         {
-            var dbArticle = _database.Articles.Single(p => p.Id == id);
+            var dbArticle = _database.Articles.Single(p => p.Key == id);
 
             _database.Articles.Remove(dbArticle);
 
@@ -205,8 +204,8 @@ namespace VivesBlog.Ui.MVC
             article ??= new Article();
 
             var authors = _database.People
-                .OrderBy(a => a.FirstName)
-                .ThenBy(a => a.LastName)
+                .OrderBy(a => a.Name1)
+                .ThenBy(a => a.Name2)
                 .ToList();
 
             var articleModel = new ArticleModel
@@ -218,7 +217,4 @@ namespace VivesBlog.Ui.MVC
             return articleModel;
         }
     }
-
 }
-
-
